@@ -1,7 +1,10 @@
 package models
 
 import (
+	"errors"
+
 	"example.com/rest-api/db"
+	"example.com/rest-api/utils"
 )
 
 type User struct {
@@ -10,7 +13,7 @@ type User struct {
 	password string `binding:"required"`
 }
 
-func (u User) Save() error {
+func (u *User) Save() error {
 	query := "INSERT INTO users(email, password) VALUES (?, ?)"
 	stmt, err := db.DB.Prepare(query)
 
@@ -20,7 +23,13 @@ func (u User) Save() error {
 
 	defer stmt.Close()
 
-	result, err := stmt.Exec(u.Email, u.password)
+	hashedPassword, err := utils.HashPassword(u.password)
+
+	if err != nil {
+		return err
+	}
+
+	result, err := stmt.Exec(u.Email, hashedPassword)
 
 	if err != nil {
 		return err
@@ -31,4 +40,24 @@ func (u User) Save() error {
 	u.ID = UserId
 
 	return err
+}
+
+func (u User) ValidateCredential() error {
+	query := "SELECT email, password FROM users WHERE email = ?"
+	row := db.DB.QueryRow(query, u.Email)
+
+	var retrievedPassword string
+	err := row.Scan(&retrievedPassword)
+
+	if err != nil {
+		return errors.New("Credential invalid")
+	}
+
+	passwordIsValid := utils.CheckPassWordHash(u.password, retrievedPassword)
+
+	if !passwordIsValid {
+		return errors.New("Credential invalid")
+	}
+
+	return nil
 }
