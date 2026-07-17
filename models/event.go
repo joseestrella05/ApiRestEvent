@@ -15,8 +15,6 @@ type Event struct {
 	UserId      int
 }
 
-var events = []Event{}
-
 func (e *Event) Save() error {
 	query := `
 	INSERT INTO events(name, description, location, dateTime, user_id) 
