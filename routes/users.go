@@ -12,16 +12,16 @@ func signup(context *gin.Context) {
 	var user models.User
 
 	err := context.ShouldBindJSON(&user)
-
 	if err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"message": "Could not parse request data. "})
+		context.JSON(http.StatusBadRequest, gin.H{"message": "Could not parse request data."})
 		return
 	}
 
 	err = user.Save()
-
 	if err != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"message": "Could not parse request data. "})
+		// Loguea el error real en tu consola para saber exactamente qué falló en la DB
+		println("Error saving user:", err.Error())
+		context.JSON(http.StatusInternalServerError, gin.H{"message": "Could not save user."})
 		return
 	}
 
