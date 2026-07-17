@@ -19,7 +19,6 @@ func signup(context *gin.Context) {
 
 	err = user.Save()
 	if err != nil {
-		// Loguea el error real en tu consola para saber exactamente qué falló en la DB
 		println("Error saving user:", err.Error())
 		context.JSON(http.StatusInternalServerError, gin.H{"message": "Could not save user."})
 		return
