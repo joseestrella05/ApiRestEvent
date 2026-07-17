@@ -8,9 +8,9 @@ import (
 )
 
 type User struct {
-	ID       int64
-	Email    string `binding:"required"`
-	password string `binding:"required"`
+	ID       int64  `json:"id"`
+	Email    string `json:"email" binding:"required"`
+	Password string `json:"password" binding:"required"`
 }
 
 func (u *User) Save() error {
@@ -23,7 +23,7 @@ func (u *User) Save() error {
 
 	defer stmt.Close()
 
-	hashedPassword, err := utils.HashPassword(u.password)
+	hashedPassword, err := utils.HashPassword(u.Password)
 
 	if err != nil {
 		return err
@@ -53,7 +53,7 @@ func (u User) ValidateCredential() error {
 		return errors.New("Credential invalid")
 	}
 
-	passwordIsValid := utils.CheckPassWordHash(u.password, retrievedPassword)
+	passwordIsValid := utils.CheckPassWordHash(u.Password, retrievedPassword)
 
 	if !passwordIsValid {
 		return errors.New("Credential invalid")
