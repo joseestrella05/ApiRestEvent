@@ -47,6 +47,8 @@ func GetAllEvents() ([]Event, error) {
 	}
 	defer rows.Close()
 
+	var localEvents []Event = []Event{}
+
 	for rows.Next() {
 		var event Event
 		err := rows.Scan(&event.ID, &event.Name, &event.Description, &event.Location, &event.DateTime, &event.UserId)
@@ -54,8 +56,10 @@ func GetAllEvents() ([]Event, error) {
 		if err != nil {
 			return nil, err
 		}
+
+		localEvents = append(localEvents, event)
 	}
-	return events, nil
+	return localEvents, nil
 }
 
 func GetAllEventsById(id int64) (*Event, error) {
